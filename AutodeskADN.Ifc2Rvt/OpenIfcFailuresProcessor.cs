@@ -63,17 +63,17 @@ namespace Autodesk.ADN.Ifc2Rvt
 
                     if (failingElementIds.Count > 0)
                     {
-                        string fResolutionCaption = f.GetDefaultResolutionCaption();
-                        if (fResolutionCaption.Equals("Delete Element(s)"))
+                        if (f.HasResolutionOfType(FailureResolutionType.DeleteElements))
                         {
                             MainApp.LogTrace("FailureInstruction `Delete Element(s)` found. It will delete failling elements to resolve the failure.");
                             MainApp.LogTrace($"Following elements will be delted: {string.Join(",", failingElementIds.Select(eid => eid.IntegerValue))}");
+
+                            f.SetCurrentResolutionType(FailureResolutionType.DeleteElements);
                         }
 
-                        if (fResolutionCaption.Equals("Delete Instance(s)"))
+                        if (f.GetFailureDefinitionId() == BuiltInFailures.FamilyFailures.FamilyIsCorruptError)
                         {
-                            MainApp.LogTrace("FailureInstruction `Delete Instance(s)` found. It will delete failling elements to resolve the failure.");
-                            MainApp.LogTrace($"Following elements will be delted: {string.Join(",", failingElementIds.Select(eid => eid.IntegerValue))}");
+                            MainApp.LogTrace("Some families have become unusable. It will reload the families, or delete them from the model.");
                         }
 
                         hasError = true;
@@ -97,6 +97,7 @@ namespace Autodesk.ADN.Ifc2Rvt
                 }
             }
 
+            MainApp.LogTrace("Attempting to continue.");
             return FailureProcessingResult.Continue;
         }
     }
